@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'react-toastify/dist/ReactToastify.css';
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-background font-body;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-button font-medium transition-all duration-200 hover:bg-primary-dark hover:shadow-md active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-surface text-gray-700 px-4 py-2 rounded-button font-medium border border-gray-200 transition-all duration-200 hover:border-primary hover:text-primary hover:shadow-md active:scale-95;
+  }
+  
+  .card {
+    @apply bg-surface rounded-card border border-gray-100 transition-all duration-200;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-card-hover hover:scale-[1.02];
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200;
+  }
+  
+  .gradient-background {
+    background: linear-gradient(135deg, #F8F7FE 0%, #EDE9FE 100%);
+  }
+}
+
+/* Toast customizations */
+.Toastify__toast-container {
+  width: 400px;
+}
+
+.Toastify__toast {
+  @apply font-body text-sm;
+  border-radius: 8px;
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #F44336 0%, #EF5350 100%);
+}
+
+.Toastify__toast--warning {
+  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Priority indicators */
+.priority-high {
+  @apply text-red-500 bg-red-50 border-red-200;
+}
+
+.priority-medium {
+  @apply text-amber-500 bg-amber-50 border-amber-200;
+}
+
+.priority-low {
+  @apply text-green-500 bg-green-50 border-green-200;
+}
+
+/* Completion animation */
+.task-complete {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.checkmark-animation {
+  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

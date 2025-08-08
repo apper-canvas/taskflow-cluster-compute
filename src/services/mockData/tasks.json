@@ -1,0 +1,90 @@
+[
+  {
+    "Id": 1,
+    "title": "Review quarterly budget proposal",
+    "description": "Analyze Q4 budget allocation and provide feedback on resource distribution",
+    "categoryId": 1,
+    "priority": "high",
+    "dueDate": "2024-01-15T10:00:00.000Z",
+    "completed": false,
+    "createdAt": "2024-01-10T09:00:00.000Z",
+    "completedAt": null
+  },
+  {
+    "Id": 2,
+    "title": "Prepare presentation slides",
+    "description": "Create slides for Monday's team meeting covering project progress",
+    "categoryId": 1,
+    "priority": "high",
+    "dueDate": "2024-01-14T14:00:00.000Z",
+    "completed": false,
+    "createdAt": "2024-01-10T11:00:00.000Z",
+    "completedAt": null
+  },
+  {
+    "Id": 3,
+    "title": "Call dentist for appointment",
+    "description": "Schedule routine cleaning and checkup",
+    "categoryId": 2,
+    "priority": "medium",
+    "dueDate": "2024-01-16T09:00:00.000Z",
+    "completed": false,
+    "createdAt": "2024-01-10T08:30:00.000Z",
+    "completedAt": null
+  },
+  {
+    "Id": 4,
+    "title": "Grocery shopping for the week",
+    "description": "Buy vegetables, fruits, and pantry essentials",
+    "categoryId": 2,
+    "priority": "medium",
+    "dueDate": "2024-01-13T17:00:00.000Z",
+    "completed": true,
+    "createdAt": "2024-01-09T20:00:00.000Z",
+    "completedAt": "2024-01-12T16:30:00.000Z"
+  },
+  {
+    "Id": 5,
+    "title": "Morning jog in the park",
+    "description": "30-minute cardio session to start the day",
+    "categoryId": 3,
+    "priority": "low",
+    "dueDate": "2024-01-13T07:00:00.000Z",
+    "completed": true,
+    "createdAt": "2024-01-12T22:00:00.000Z",
+    "completedAt": "2024-01-13T07:15:00.000Z"
+  },
+  {
+    "Id": 6,
+    "title": "Read chapter 5 of productivity book",
+    "description": "Continue learning about time management techniques",
+    "categoryId": 2,
+    "priority": "low",
+    "dueDate": "2024-01-20T21:00:00.000Z",
+    "completed": false,
+    "createdAt": "2024-01-10T19:00:00.000Z",
+    "completedAt": null
+  },
+  {
+    "Id": 7,
+    "title": "Update project documentation",
+    "description": "Add recent changes and deployment notes to README",
+    "categoryId": 1,
+    "priority": "medium",
+    "dueDate": "2024-01-18T16:00:00.000Z",
+    "completed": false,
+    "createdAt": "2024-01-10T15:00:00.000Z",
+    "completedAt": null
+  },
+  {
+    "Id": 8,
+    "title": "Plan weekend hiking trip",
+    "description": "Research trails and pack essentials for Saturday adventure",
+    "categoryId": 2,
+    "priority": "low",
+    "dueDate": "2024-01-19T12:00:00.000Z",
+    "completed": false,
+    "createdAt": "2024-01-11T18:00:00.000Z",
+    "completedAt": null
+  }
+]
