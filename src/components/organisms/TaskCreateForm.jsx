@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import { taskService } from "@/services/api/taskService";
 import { categoryService } from "@/services/api/categoryService";
 import FormField from "@/components/molecules/FormField";
@@ -9,11 +10,8 @@ import Textarea from "@/components/atoms/Textarea";
 import Select from "@/components/atoms/Select";
 import PrioritySelect from "@/components/molecules/PrioritySelect";
 import ApperIcon from "@/components/ApperIcon";
-import { toast } from "react-toastify";
 
 const TaskCreateForm = ({ onTaskCreated, onClose }) => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -21,7 +19,10 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
     priority: "medium",
     dueDate: "",
   });
-  const [errors, setErrors] = useState({});
+
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -29,11 +30,14 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
 
   const loadCategories = async () => {
     try {
+      setLoading(true);
       const categoriesData = await categoryService.getAll();
       setCategories(categoriesData);
-    } catch (err) {
-      console.error("Error loading categories:", err);
+    } catch (error) {
+      console.error("Error loading categories:", error);
       toast.error("Failed to load categories");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,36 +47,25 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ""
-      }));
-    }
   };
 
-  const handlePriorityChange = (e) => {
+  const handlePriorityChange = (value) => {
     setFormData(prev => ({
       ...prev,
-      priority: e.target.value
+      priority: value
     }));
   };
 
   const validateForm = () => {
-    const newErrors = {};
-
     if (!formData.title.trim()) {
-      newErrors.title = "Title is required";
+      toast.error("Task title is required");
+      return false;
     }
-
     if (!formData.categoryId) {
-      newErrors.categoryId = "Category is required";
+      toast.error("Please select a category");
+      return false;
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true;
   };
 
   const handleSubmit = async (e) => {
@@ -80,8 +73,9 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
     
     if (!validateForm()) return;
 
-    setLoading(true);
     try {
+      setIsSubmitting(true);
+      
       const taskData = {
         ...formData,
         categoryId: parseInt(formData.categoryId),
@@ -100,127 +94,114 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
         priority: "medium",
         dueDate: "",
       });
-      
+
       if (onTaskCreated) onTaskCreated();
       if (onClose) onClose();
-      
-    } catch (err) {
-      console.error("Error creating task:", err);
+
+    } catch (error) {
+      console.error("Error creating task:", error);
       toast.error("Failed to create task");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="card p-6"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Create New Task</h2>
-        {onClose && (
+      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">Create New Task</h2>
           <Button
-            type="button"
             variant="ghost"
-            size="sm"
             onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full"
           >
-            <ApperIcon name="X" size={16} />
+            <ApperIcon name="X" size={20} />
           </Button>
-        )}
-      </div>
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <FormField
-          label="Task Title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          error={errors.title}
-          required
-          placeholder="Enter task title..."
-          autoFocus
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <FormField
+            label="Task Title"
+            required
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Enter task title..."
+            disabled={isSubmitting}
+          />
 
-        <FormField
-          label="Description"
-          name="description"
-          type="textarea"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Add task description..."
-        />
+          <FormField
+            label="Description"
+            type="textarea"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Enter task description..."
+            rows={3}
+            disabled={isSubmitting}
+          />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             label="Category"
-            name="categoryId"
-            error={errors.categoryId}
             required
+            type="select"
+            name="categoryId"
+            value={formData.categoryId}
+            onChange={handleChange}
+            disabled={isSubmitting || loading}
           >
-            <Select
-              name="categoryId"
-              value={formData.categoryId}
-              onChange={handleChange}
-            >
-              <option value="">Select Category</option>
-              {categories.map(category => (
-                <option key={category.Id} value={category.Id}>
-                  {category.name}
-                </option>
-              ))}
-            </Select>
+            <option value="">Select a category</option>
+            {categories.map(category => (
+              <option key={category.Id} value={category.Id}>
+                {category.name_c || category.name}
+              </option>
+            ))}
           </FormField>
 
-          <FormField
-            label="Priority"
-            name="priority"
-          >
+          <FormField label="Priority">
             <PrioritySelect
               value={formData.priority}
               onChange={handlePriorityChange}
+              disabled={isSubmitting}
             />
           </FormField>
-        </div>
 
-        <FormField
-          label="Due Date"
-          name="dueDate"
-          type="datetime-local"
-          value={formData.dueDate}
-          onChange={handleChange}
-        />
+          <FormField
+            label="Due Date"
+            type="datetime-local"
+            name="dueDate"
+            value={formData.dueDate}
+            onChange={handleChange}
+            disabled={isSubmitting}
+          />
 
-        <div className="flex items-center justify-end space-x-3 pt-4">
-          {onClose && (
-            <Button 
-              type="button" 
-              variant="secondary" 
+          <div className="flex space-x-3 pt-4">
+            <Button
+              type="button"
+              variant="secondary"
               onClick={onClose}
-              disabled={loading}
+              disabled={isSubmitting}
+              className="flex-1"
             >
               Cancel
             </Button>
-          )}
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="min-w-[100px]"
-          >
-            {loading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Creating...</span>
-              </div>
-            ) : (
-              "Create Task"
-            )}
-          </Button>
-        </div>
-      </form>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1"
+            >
+              {isSubmitting ? "Creating..." : "Create Task"}
+            </Button>
+          </div>
+        </form>
+      </div>
     </motion.div>
   );
 };
