@@ -1,13 +1,11 @@
 // Cloudflare Workers globals
-declare global {
-  var Response: typeof Response;
-  var fetch: typeof fetch;
-  var console: Console;
-  var apper: {
-    getSecret: (key: string) => Promise<string>;
-    serve: (handler: (request: Request) => Promise<Response>) => void;
-  };
-}
+// Custom action for generating AI-powered task descriptions
+// Uses apper.serve() pattern for edge function deployment
+
+// Declare globals for Cloudflare Workers environment
+const Response = globalThis.Response || global.Response;
+const fetch = globalThis.fetch || global.fetch;
+const apper = globalThis.apper || global.apper;
 
 export default {
   async fetch(request, env) {
@@ -158,7 +156,7 @@ export default {
 // Edge Functions entry point
 if (typeof apper !== 'undefined') {
   apper.serve(async (request) => {
-    const module = await import('./generate-task-description.js');
+    const module = await import('@/apper/functions/generate-task-description.js');
     return module.default.fetch(request);
   });
 }
