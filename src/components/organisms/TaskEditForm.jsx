@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { format } from "date-fns";
+import { toast } from "react-toastify";
+import { taskService } from "@/services/api/taskService";
+import ApperIcon from "@/components/ApperIcon";
 import FormField from "@/components/molecules/FormField";
 import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
@@ -16,7 +19,8 @@ const TaskEditForm = ({ task, categories, onSave, onCancel }) => {
     dueDate: task.dueDate ? format(new Date(task.dueDate), "yyyy-MM-dd'T'HH:mm") : "",
   });
 
-  const [errors, setErrors] = useState({});
+const [errors, setErrors] = useState({});
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,8 +72,31 @@ const TaskEditForm = ({ task, categories, onSave, onCancel }) => {
     };
 
     onSave(updates);
-  };
+};
 
+  const handleGenerateDescription = async () => {
+    if (!formData.title.trim()) {
+      toast.error("Please enter a task title first");
+      return;
+    }
+
+    try {
+      setIsGeneratingDescription(true);
+      const generatedDescription = await taskService.generateDescription(formData.title);
+      
+      setFormData(prev => ({
+        ...prev,
+        description: generatedDescription
+      }));
+      
+      toast.success("Description generated successfully!");
+    } catch (error) {
+      console.error("Error generating description:", error);
+      toast.error(error.message || "Failed to generate description. Please try again.");
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <FormField
@@ -82,14 +109,30 @@ const TaskEditForm = ({ task, categories, onSave, onCancel }) => {
         placeholder="Enter task title..."
       />
 
-      <FormField
-        label="Description"
-        name="description"
-        type="textarea"
-        value={formData.description}
-        onChange={handleChange}
-        placeholder="Add task description..."
-      />
+<div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium text-gray-700">Description</label>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleGenerateDescription}
+            disabled={isGeneratingDescription || !formData.title.trim()}
+            className="text-primary hover:text-primary-dark text-xs"
+          >
+            <ApperIcon name="Sparkles" size={14} className="mr-1" />
+            {isGeneratingDescription ? "Generating..." : "Generate"}
+          </Button>
+        </div>
+        <Textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Add task description or use the Generate button..."
+          rows={3}
+          generating={isGeneratingDescription}
+        />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField

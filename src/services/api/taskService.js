@@ -14,6 +14,7 @@ const mapToDatabase = (data) => {
   return {
     ...(data.title !== undefined && { title_c: data.title }),
     ...(data.description !== undefined && { description_c: data.description }),
+    ...(data.generatedDescription !== undefined && { generated_description_c: data.generatedDescription }),
     ...(data.priority !== undefined && { priority_c: data.priority }),
     ...(data.dueDate !== undefined && { due_date_c: data.dueDate }),
     ...(data.completed !== undefined && { completed_c: data.completed }),
@@ -29,6 +30,7 @@ const mapFromDatabase = (data) => {
     Id: data.Id,
     title: data.title_c,
     description: data.description_c,
+    generatedDescription: data.generated_description_c,
     priority: data.priority_c,
     dueDate: data.due_date_c,
     completed: data.completed_c,
@@ -42,11 +44,12 @@ export const taskService = {
   async getAll() {
     try {
       const apperClient = getApperClient();
-      const params = {
+const params = {
         fields: [
           {"field": {"Name": "Id"}},
           {"field": {"Name": "title_c"}},
           {"field": {"Name": "description_c"}},
+          {"field": {"Name": "generated_description_c"}},
           {"field": {"Name": "priority_c"}},
           {"field": {"Name": "due_date_c"}},
           {"field": {"Name": "completed_c"}},
@@ -323,5 +326,28 @@ export const taskService = {
       console.error("Error fetching tasks by priority:", error?.response?.data?.message || error);
       return [];
     }
-}
+},
+
+  async generateDescription(title) {
+    try {
+      const response = await fetch(`https://test-api.apper.io/fn/${import.meta.env.VITE_GENERATE_TASK_DESCRIPTION}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title })
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to generate description');
+      }
+
+      return data.description;
+    } catch (error) {
+      console.error("Error generating description:", error?.message || error);
+      throw error;
+    }
+  }
 };

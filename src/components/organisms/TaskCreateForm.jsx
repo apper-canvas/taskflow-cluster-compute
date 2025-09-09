@@ -21,8 +21,9 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
   });
 
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
+const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -54,8 +55,31 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
       ...prev,
       priority: value
     }));
-  };
+};
 
+  const handleGenerateDescription = async () => {
+    if (!formData.title.trim()) {
+      toast.error("Please enter a task title first");
+      return;
+    }
+
+    try {
+      setIsGeneratingDescription(true);
+      const generatedDescription = await taskService.generateDescription(formData.title);
+      
+      setFormData(prev => ({
+        ...prev,
+        description: generatedDescription
+      }));
+      
+      toast.success("Description generated successfully!");
+    } catch (error) {
+      console.error("Error generating description:", error);
+      toast.error(error.message || "Failed to generate description. Please try again.");
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
   const validateForm = () => {
     if (!formData.title.trim()) {
       toast.error("Task title is required");
@@ -137,16 +161,31 @@ const TaskCreateForm = ({ onTaskCreated, onClose }) => {
             disabled={isSubmitting}
           />
 
-          <FormField
-            label="Description"
-            type="textarea"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Enter task description..."
-            rows={3}
-            disabled={isSubmitting}
-          />
+<div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-gray-700">Description</label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleGenerateDescription}
+                disabled={isSubmitting || isGeneratingDescription || !formData.title.trim()}
+                className="text-primary hover:text-primary-dark text-xs"
+              >
+                <ApperIcon name="Sparkles" size={14} className="mr-1" />
+                {isGeneratingDescription ? "Generating..." : "Generate"}
+              </Button>
+            </div>
+            <Textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Enter task description or use the Generate button..."
+              rows={3}
+              disabled={isSubmitting}
+              generating={isGeneratingDescription}
+            />
+          </div>
 
           <FormField
             label="Category"
