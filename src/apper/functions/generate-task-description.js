@@ -1,5 +1,13 @@
 // Cloudflare Workers globals
-/* global Response, fetch, apper */
+declare global {
+  var Response: typeof Response;
+  var fetch: typeof fetch;
+  var console: Console;
+  var apper: {
+    getSecret: (key: string) => Promise<string>;
+    serve: (handler: (request: Request) => Promise<Response>) => void;
+  };
+}
 
 export default {
   async fetch(request, env) {
@@ -148,7 +156,9 @@ export default {
 };
 
 // Edge Functions entry point
-apper.serve(async (request) => {
-  const handler = await import('./generate-task-description.js');
-  return handler.default.fetch(request);
-});
+if (typeof apper !== 'undefined') {
+  apper.serve(async (request) => {
+    const module = await import('./generate-task-description.js');
+    return module.default.fetch(request);
+  });
+}
