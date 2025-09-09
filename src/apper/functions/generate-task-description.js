@@ -1,9 +1,5 @@
 // Cloudflare Workers globals
-declare global {
-  const Response: typeof globalThis.Response;
-  const fetch: typeof globalThis.fetch;
-  const apper: any;
-}
+/* global Response, fetch, apper */
 
 export default {
   async fetch(request, env) {
