@@ -3,9 +3,9 @@
 // Uses apper.serve() pattern for edge function deployment
 
 // Declare globals for Cloudflare Workers environment
-const Response = globalThis.Response || global.Response;
-const fetch = globalThis.fetch || global.fetch;
-const apper = globalThis.apper || global.apper;
+const Response = globalThis.Response;
+const fetch = globalThis.fetch;
+const apper = globalThis.apper;
 
 export default {
   async fetch(request, env) {

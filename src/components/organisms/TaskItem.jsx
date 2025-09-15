@@ -121,8 +121,7 @@ categories={categories}
                     )}>
                       {dueDateInfo}
                     </span>
-</span>
-                  )}
+)}
                 </div>
                 {/* Assigned User */}
                 {task.assignedTo && (
