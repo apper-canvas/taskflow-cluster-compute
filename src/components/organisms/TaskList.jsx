@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { taskService } from "@/services/api/taskService";
 import { categoryService } from "@/services/api/categoryService";
+import { userService } from "@/services/api/userService";
 import TaskItem from "@/components/organisms/TaskItem";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
@@ -10,7 +11,8 @@ import { toast } from "react-toastify";
 
 const TaskList = ({ activeFilter, selectedCategory, searchQuery, onTaskUpdate }) => {
   const [tasks, setTasks] = useState([]);
-  const [categories, setCategories] = useState([]);
+const [categories, setCategories] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -18,7 +20,7 @@ const TaskList = ({ activeFilter, selectedCategory, searchQuery, onTaskUpdate })
     try {
       setError(null);
       setLoading(true);
-      const [tasksData, categoriesData] = await Promise.all([
+const [tasksData, categoriesData, usersData] = await Promise.all([
         taskService.getAll(),
         categoryService.getAll()
       ]);
@@ -143,8 +145,8 @@ const TaskList = ({ activeFilter, selectedCategory, searchQuery, onTaskUpdate })
     <div className="space-y-3">
       <AnimatePresence mode="popLayout">
         {filteredTasks.map((task) => {
-          const taskCategory = categories.find(cat => cat.Id === task.categoryId);
-          
+const taskCategory = categories.find(cat => cat.Id === task.categoryId);
+          const assignedUser = users.find(user => user.Id === task.assignedTo);
           return (
             <motion.div
               key={task.Id}

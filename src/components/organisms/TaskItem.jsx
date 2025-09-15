@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
+import TaskEditForm from "@/components/organisms/TaskEditForm";
+import CategoryIndicator from "@/components/molecules/CategoryIndicator";
 import Button from "@/components/atoms/Button";
 import Badge from "@/components/atoms/Badge";
-import CategoryIndicator from "@/components/molecules/CategoryIndicator";
-import TaskEditForm from "@/components/organisms/TaskEditForm";
-import { cn } from "@/utils/cn";
 
-const TaskItem = ({ task, category, categories, onToggleComplete, onDelete, onUpdate }) => {
+const TaskItem = ({ task, category, categories, users, onToggleComplete, onDelete, onUpdate }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
   const formatDueDate = (dateString) => {
     if (!dateString) return null;
     const date = new Date(dateString);
@@ -79,7 +78,8 @@ const TaskItem = ({ task, category, categories, onToggleComplete, onDelete, onUp
           {isEditing ? (
             <TaskEditForm
               task={task}
-              categories={categories}
+categories={categories}
+              users={users}
               onSave={handleSaveEdit}
               onCancel={() => setIsEditing(false)}
             />
@@ -121,8 +121,18 @@ const TaskItem = ({ task, category, categories, onToggleComplete, onDelete, onUp
                     )}>
                       {dueDateInfo}
                     </span>
+</span>
                   )}
                 </div>
+                {/* Assigned User */}
+                {task.assignedTo && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <ApperIcon name="User" size={14} />
+                    <span>
+                      {users?.find(u => u.Id === task.assignedTo)?.Name || 'Unknown User'}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Expanded Content */}

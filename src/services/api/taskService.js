@@ -20,7 +20,8 @@ const mapToDatabase = (data) => {
     ...(data.completed !== undefined && { completed_c: data.completed }),
     ...(data.createdAt !== undefined && { created_at_c: data.createdAt }),
     ...(data.completedAt !== undefined && { completed_at_c: data.completedAt }),
-    ...(data.categoryId !== undefined && { category_id_c: parseInt(data.categoryId) })
+...(data.categoryId !== undefined && { category_id_c: parseInt(data.categoryId) }),
+    ...(data.assignedTo !== undefined && { assignedTo: parseInt(data.assignedTo) })
   };
 };
 
@@ -36,7 +37,8 @@ const mapFromDatabase = (data) => {
     completed: data.completed_c,
     createdAt: data.created_at_c,
     completedAt: data.completed_at_c,
-    categoryId: data.category_id_c?.Id || data.category_id_c
+categoryId: data.category_id_c?.Id || data.category_id_c,
+    assignedTo: data.assignedTo?.Id || data.assignedTo
   };
 };
 
@@ -55,7 +57,8 @@ const params = {
           {"field": {"Name": "completed_c"}},
           {"field": {"Name": "created_at_c"}},
           {"field": {"Name": "completed_at_c"}},
-          {"field": {"Name": "category_id_c"}}
+{"field": {"Name": "category_id_c"}},
+          {"field": {"Name": "assignedTo"}}
         ],
         orderBy: [{"fieldName": "created_at_c", "sorttype": "DESC"}]
       };
@@ -87,7 +90,8 @@ const params = {
           {"field": {"Name": "completed_c"}},
           {"field": {"Name": "created_at_c"}},
           {"field": {"Name": "completed_at_c"}},
-          {"field": {"Name": "category_id_c"}}
+{"field": {"Name": "category_id_c"}},
+          {"field": {"Name": "assignedTo"}}
         ]
       };
 
@@ -242,7 +246,8 @@ const params = {
           {"field": {"Name": "completed_c"}},
           {"field": {"Name": "created_at_c"}},
           {"field": {"Name": "completed_at_c"}},
-          {"field": {"Name": "category_id_c"}}
+{"field": {"Name": "category_id_c"}},
+          {"field": {"Name": "assignedTo"}}
         ],
         where: [{"FieldName": "category_id_c", "Operator": "EqualTo", "Values": [parseInt(categoryId)]}],
         orderBy: [{"fieldName": "created_at_c", "sorttype": "DESC"}]
@@ -275,7 +280,8 @@ const params = {
           {"field": {"Name": "completed_c"}},
           {"field": {"Name": "created_at_c"}},
           {"field": {"Name": "completed_at_c"}},
-          {"field": {"Name": "category_id_c"}}
+{"field": {"Name": "category_id_c"}},
+          {"field": {"Name": "assignedTo"}}
         ],
         where: [{"FieldName": "completed_c", "Operator": "EqualTo", "Values": [completed]}],
         orderBy: [{"fieldName": "created_at_c", "sorttype": "DESC"}]
@@ -308,7 +314,8 @@ const params = {
           {"field": {"Name": "completed_c"}},
           {"field": {"Name": "created_at_c"}},
           {"field": {"Name": "completed_at_c"}},
-          {"field": {"Name": "category_id_c"}}
+{"field": {"Name": "category_id_c"}},
+          {"field": {"Name": "assignedTo"}}
         ],
         where: [{"FieldName": "priority_c", "Operator": "EqualTo", "Values": [priority]}],
         orderBy: [{"fieldName": "created_at_c", "sorttype": "DESC"}]

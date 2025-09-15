@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { taskService } from "@/services/api/taskService";
 import { categoryService } from "@/services/api/categoryService";
+import { userService } from "@/services/api/userService";
 import FormField from "@/components/molecules/FormField";
 import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
@@ -10,39 +11,43 @@ import Textarea from "@/components/atoms/Textarea";
 import Select from "@/components/atoms/Select";
 import PrioritySelect from "@/components/molecules/PrioritySelect";
 import ApperIcon from "@/components/ApperIcon";
-
 const TaskCreateForm = ({ onTaskCreated, onClose }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     title: "",
     description: "",
     categoryId: "",
+    assignedTo: "",
     priority: "medium",
     dueDate: "",
   });
 
-  const [categories, setCategories] = useState([]);
-const [loading, setLoading] = useState(false);
+const [categories, setCategories] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
-
   useEffect(() => {
-    loadCategories();
+loadData();
   }, []);
 
-  const loadCategories = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const categoriesData = await categoryService.getAll();
+      const [categoriesData, usersData] = await Promise.all([
+        categoryService.getAll(),
+        userService.getAll()
+      ]);
       setCategories(categoriesData);
+      setUsers(usersData);
     } catch (error) {
-      console.error("Error loading categories:", error);
-      toast.error("Failed to load categories");
+      console.error("Error loading data:", error);
+      toast.error("Failed to load categories and users");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
+const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -55,7 +60,14 @@ const [loading, setLoading] = useState(false);
       ...prev,
       priority: value
     }));
-};
+  };
+
+  const handleUserChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      assignedTo: e.target.value
+    }));
+  };
 
   const handleGenerateDescription = async () => {
     if (!formData.title.trim()) {
@@ -92,7 +104,7 @@ const [loading, setLoading] = useState(false);
     return true;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) return;
@@ -103,6 +115,7 @@ const [loading, setLoading] = useState(false);
       const taskData = {
         ...formData,
         categoryId: parseInt(formData.categoryId),
+        assignedTo: formData.assignedTo ? parseInt(formData.assignedTo) : null,
         dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
       };
 
@@ -110,11 +123,12 @@ const [loading, setLoading] = useState(false);
       
       toast.success("Task created successfully!");
       
-      // Reset form
+// Reset form
       setFormData({
         title: "",
         description: "",
         categoryId: "",
+        assignedTo: "",
         priority: "medium",
         dueDate: "",
       });
@@ -210,6 +224,21 @@ const [loading, setLoading] = useState(false);
               onChange={handlePriorityChange}
               disabled={isSubmitting}
             />
+          </FormField>
+<FormField
+            label="Assigned To"
+            name="assignedTo"
+            type="select"
+            value={formData.assignedTo}
+            onChange={handleUserChange}
+            disabled={isSubmitting}
+          >
+            <option value="">Select teammate...</option>
+            {users.map((user) => (
+              <option key={user.Id} value={user.Id}>
+                {user.Name} ({user.role})
+              </option>
+            ))}
           </FormField>
 
           <FormField

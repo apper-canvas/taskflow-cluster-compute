@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import { taskService } from "@/services/api/taskService";
+import { userService } from "@/services/api/userService";
 import ApperIcon from "@/components/ApperIcon";
 import FormField from "@/components/molecules/FormField";
 import Button from "@/components/atoms/Button";
@@ -9,18 +10,32 @@ import Input from "@/components/atoms/Input";
 import Textarea from "@/components/atoms/Textarea";
 import Select from "@/components/atoms/Select";
 import PrioritySelect from "@/components/molecules/PrioritySelect";
-
 const TaskEditForm = ({ task, categories, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     title: task.title || "",
     description: task.description || "",
     categoryId: task.categoryId || "",
+    assignedTo: task.assignedTo || "",
     priority: task.priority || "medium",
     dueDate: task.dueDate ? format(new Date(task.dueDate), "yyyy-MM-dd'T'HH:mm") : "",
   });
 
 const [errors, setErrors] = useState({});
+const [users, setUsers] = useState([]);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = async () => {
+    try {
+      const usersData = await userService.getAll();
+      setUsers(usersData);
+    } catch (error) {
+      console.error("Error loading users:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,8 +81,9 @@ const [errors, setErrors] = useState({});
     if (!validateForm()) return;
 
     const updates = {
-      ...formData,
+...formData,
       categoryId: parseInt(formData.categoryId),
+      assignedTo: formData.assignedTo ? parseInt(formData.assignedTo) : null,
       dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
     };
 
@@ -165,6 +181,21 @@ const [errors, setErrors] = useState({});
           />
         </FormField>
       </div>
+
+<FormField
+        label="Assigned To"
+        name="assignedTo"
+        type="select"
+        value={formData.assignedTo}
+        onChange={handleChange}
+      >
+        <option value="">Select teammate...</option>
+        {users.map((user) => (
+          <option key={user.Id} value={user.Id}>
+            {user.Name} ({user.role})
+          </option>
+        ))}
+      </FormField>
 
       <FormField
         label="Due Date"
